@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vouvis-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vouvis-api
+  template:
+    metadata:
+      labels:
+        app: vouvis-api
+    spec:
+      containers:
+        - name: api
+          image: vouvis-api:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: vouvis-creds
+          env:
+            - name: OPENAI_BASE_URL
+              value: "https://llm.ai.e-infra.cz/v1/"
+            - name: REQUEST_TIMEOUT_S
+              value: "180"
+          # Optional GPU: uncomment and use a cluster with nvidia.com/gpu
+          # resources:
+          #   limits:
+          #     nvidia.com/gpu: 1
+          #     memory: "16Gi"
+          #     cpu: "4"
+          resources:
+            requests:
+              memory: "4Gi"
+              cpu: "2"
+            limits:
+              memory: "16Gi"
+              cpu: "8"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10

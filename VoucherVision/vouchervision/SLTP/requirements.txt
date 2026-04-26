@@ -1,0 +1,17 @@
+datasets
+dask
+scikit-learn
+openai
+transformers
+chromadb
+InstructorEmbedding
+langchain
+huggingface_hub
+matplotlib
+torch
+sentence-transformers
+plotly
+kaleido
+seaborn
+certifi
+Levenshtein

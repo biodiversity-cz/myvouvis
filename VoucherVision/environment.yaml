@@ -1,0 +1,14 @@
+name: vouchervision
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - wheel
+  - numpy
+  - opencv
+  - pandas
+  - matplotlib
+  - matplotlib-inline
+  - openpyxl

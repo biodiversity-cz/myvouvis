@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.Python
+.venv/
+venv/
+.env
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
+.DS_Store
+data/runs/
+
+# Kubernetes secrets (použijte secret.example.yaml jako šablonu)
+k8s/secret.yaml

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}myVoucherVision{% endblock %}
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-body p-4">
+    <h1 class="h3 mb-3">myVoucherVision</h1>
+    <p class="text-muted mb-2">
+      Webové rozhraní nad pipeline VoucherVision pro automatické zpracování herbářových archů.
+    </p>
+    <p class="text-muted small mb-3">
+      VoucherVision detekuje komponenty herbářového archu, rozpoznává text na primárních etiketách (OCR, LLM) a výsledky mapuje do formátu Darwin Core.
+    </p>
+    <hr class="mb-3">
+
+    <form method="post" action="/app/process" enctype="multipart/form-data">
+      <p class="text-muted">Nahrajte fotografii herbářového archu a spusťte automatické zpracování.</p>
+
+      <div class="mb-3">
+        <input
+          id="fimg"
+          class="form-control"
+          type="file"
+          name="file"
+          accept="image/*,.tif,.tiff"
+          required
+          aria-label="Vyberte soubor obrázku herbářového archu"
+          aria-describedby="fimg-hint"
+        />
+      </div>
+      <div class="small text-muted mb-3" id="fimg-hint">
+        Max. {{ max_mb }} MB, max. {{ max_edge }} px na delší straně. Delší strana může být pro zrychlení zmenšena na cca {{ resize_edge }} px. Formáty: JPEG, PNG, TIFF, WebP, BMP.
+      </div>
+
+      <button class="btn btn-primary" type="submit">Zpracovat</button>
+    </form>
+
+    {% if error %}
+    <p class="err mt-3" role="alert">{{ error }}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

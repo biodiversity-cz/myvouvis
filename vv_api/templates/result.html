@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Darwin Core záznam · myVoucherVision{% endblock %}
+{% block content %}
+<div class="card shadow-sm result-card">
+  <div class="card-body p-4">
+  <div class="result-head">
+    <div>
+      <h1 class="h3 mb-3">Darwin Core záznam</h1>
+      <p class="text-muted mb-2">Hodnoty můžete před stažením upravit v tabulce.</p>
+    </div>
+    <div class="result-actions">
+      <button type="button" class="btn primary" id="btn-csv">Stáhnout DwC CSV</button>
+      <button type="button" class="btn" id="btn-json">Stáhnout JSON</button>
+      <a class="btn" href="/app">← Nový obrázek</a>
+    </div>
+  </div>
+
+  {% if validation and not validation.ok %}
+  <p class="warn">Doplňte povinná pole: {{ validation.missing | join(', ') }}</p>
+  {% endif %}
+
+  {% if has_artifacts %}
+  <section class="art-section">
+    <h2>Náhledy (segmentace / ořezy)</h2>
+    <div class="art-grid">
+      {% for href in artifact_hrefs %}
+      <a class="art-item" href="{{ href }}" target="_blank" rel="noopener">
+        <img src="{{ href }}" alt="náhled" loading="lazy" />
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <div class="table-wrap">
+    <table class="dwc" id="dwc-table">
+      <tbody>
+        {% for k, v in rows %}
+        <tr>
+          <th><label for="f-{{ loop.index }}">{{ k }}</label></th>
+          <td>
+            <input type="text" id="f-{{ loop.index }}" name="{{ k | e }}" data-term="{{ k | e }}"
+              value="{{ (v | string if v is not none else '') | e }}" />
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="2" class="text-muted">Žádná pole (prázdný výstup LLM nebo chyba mapování).</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <details class="meta">
+    <summary>Metrika běhu</summary>
+    <pre>{{ meta_json|e }}</pre>
+  </details>
+  </div>
+</div>
+
+<script>
+(function() {
+  const table = document.getElementById("dwc-table");
+  if (!table) return;
+
+  function termValue(term) {
+    const inp = table.querySelector('input[data-term="' + term + '"]');
+    return inp ? inp.value : "";
+  }
+  function allRows() {
+    const out = [];
+    table.querySelectorAll("input[data-term]").forEach(function(inp) {
+      out.push([inp.getAttribute("data-term"), inp.value || ""]);
+    });
+    return out;
+  }
+  function escCell(s) {
+    if (s == null) return '""';
+    if (/[",\n\r]/.test(s)) return '"' + String(s).replace(/"/g, '""') + '"';
+    return s;
+  }
+
+  document.getElementById("btn-csv").addEventListener("click", function() {
+    const rows = allRows();
+    const lines = ["term,value"];
+    rows.forEach(function(r) { lines.push(escCell(r[0]) + "," + escCell(r[1])); });
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "darwin_core.csv";
+    a.click();
+    setTimeout(function() { URL.revokeObjectURL(a.href); }, 60);
+  });
+
+  document.getElementById("btn-json").addEventListener("click", function() {
+    const o = {};
+    allRows().forEach(function(r) { o[r[0]] = r[1]; });
+    const blob = new Blob([JSON.stringify(o, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "darwin_core.json";
+    a.click();
+    setTimeout(function() { URL.revokeObjectURL(a.href); }, 60);
+  });
+})();
+</script>
+{% endblock %}
