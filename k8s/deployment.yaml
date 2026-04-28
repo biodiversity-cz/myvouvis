@@ -21,8 +21,9 @@ spec:
           type: RuntimeDefault
       containers:
         - name: api
-          image: vouvis-api:latest
-          imagePullPolicy: IfNotPresent
+          # Workflow docker-publish.yml: ghcr.io + lowercase(repository); tag latest on main
+          image: ghcr.io/biodiversity-cz/myvouvis:latest
+          imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
