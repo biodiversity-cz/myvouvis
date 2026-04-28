@@ -161,7 +161,17 @@ def _copy_visual_artifacts(project_dir: Path, dest: Path) -> List[str]:
     Returns relative URL paths (posix) under dest.
     """
     dest.mkdir(parents=True, exist_ok=True)
-    exts = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
+    exts = {
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".webp",
+        ".gif",
+        ".bmp",
+        ".tif",
+        ".tiff",
+        ".jp2",
+    }
     relpaths: List[str] = []
     if not project_dir.is_dir():
         return relpaths

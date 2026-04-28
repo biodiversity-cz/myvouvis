@@ -12,23 +12,29 @@
     </p>
     <hr class="mb-3">
 
-    <form method="post" action="/app/process" enctype="multipart/form-data">
+    <form id="upload-form" method="post" action="/app/process" enctype="multipart/form-data">
       <p class="text-muted">Nahrajte fotografii herbářového archu a spusťte automatické zpracování.</p>
 
       <div class="mb-3">
+        <label class="form-label" for="fimg">Vstupní obrázek</label>
         <input
           id="fimg"
           class="form-control"
           type="file"
           name="file"
-          accept="image/*,.tif,.tiff"
+          accept=".jpg,.jpeg,.png,.tif,.tiff,.jp2"
           required
           aria-label="Vyberte soubor obrázku herbářového archu"
           aria-describedby="fimg-hint"
         />
       </div>
+      <p id="file-stat" class="small text-secondary mb-2" aria-live="polite"></p>
       <div class="small text-muted mb-3" id="fimg-hint">
-        Max. {{ max_mb }} MB, max. {{ max_edge }} px na delší straně. Delší strana může být pro zrychlení zmenšena na cca {{ resize_edge }} px. Formáty: JPEG, PNG, TIFF, WebP, BMP.
+        Maximální velikost souboru: {{ max_mb }}&nbsp;MB. Povolené formáty: JPEG, PNG, TIFF, JP2.
+        {% if resize_edge > 0 %}
+        Po nahrání může být obrázek zmenšen tak, aby delší strana měla nejvýše {{ resize_edge }}&nbsp;px (zkrátí se čas zpracování u velkých fotek).
+        {% endif %}
+        Obrázky větší než {{ max_edge }}&nbsp;px na delší straně budou odmítnuty.
       </div>
 
       <button class="btn btn-primary" type="submit">Zpracovat</button>
@@ -39,4 +45,29 @@
     {% endif %}
   </div>
 </div>
+<script>
+(function () {
+  var input = document.getElementById("fimg");
+  var form = document.getElementById("upload-form");
+  var stat = document.getElementById("file-stat");
+  var maxBytes = {{ max_upload_bytes }};
+  function fmtMb(n) { return (n / 1048576).toFixed(2); }
+  input.addEventListener("change", function () {
+    var f = input.files && input.files[0];
+    if (!f) { stat.textContent = ""; return; }
+    var line = "Vybráno: " + f.name + " (" + fmtMb(f.size) + " MB).";
+    if (f.size > maxBytes) {
+      line += " Soubor je větší než limit " + fmtMb(maxBytes) + " MB.";
+    }
+    stat.textContent = line;
+  });
+  form.addEventListener("submit", function (e) {
+    var f = input.files && input.files[0];
+    if (f && f.size > maxBytes) {
+      e.preventDefault();
+      alert("Soubor je větší než " + fmtMb(maxBytes) + " MB. Nahraj menší obrázek nebo zmenši ho lokálně.");
+    }
+  });
+})();
+</script>
 {% endblock %}

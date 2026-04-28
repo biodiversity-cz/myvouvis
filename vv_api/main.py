@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from vv_api.config import get_settings
+from vv_api.media_types import ALLOWED_UPLOAD_SUFFIXES, upload_mimetype_ok
 from vv_api.pipeline import transcribe_to_dwc
 from vv_api import web as web_routes
 
@@ -59,15 +60,22 @@ def transcribe(
     if file is None or not file.filename:
         raise HTTPException(status_code=400, detail="No file uploaded (multipart field: file)")
 
+    suffix = pathlib.Path(file.filename).suffix.lower() or ".jpg"
+    if suffix not in ALLOWED_UPLOAD_SUFFIXES:
+        raise HTTPException(
+            status_code=400,
+            detail="Allowed formats: JPEG, PNG, TIFF, JP2.",
+        )
+
+    if not upload_mimetype_ok(file.content_type):
+        raise HTTPException(
+            status_code=415,
+            detail="Allowed formats: JPEG, PNG, TIFF, JP2.",
+        )
+
     raw = file.file.read()
     if not raw:
         raise HTTPException(status_code=400, detail="Empty file")
-
-    suffix = pathlib.Path(file.filename).suffix.lower() or ".jpg"
-    if suffix not in (".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp", ".webp"):
-        raise HTTPException(
-            status_code=400, detail="Unsupported file type; use a common image format."
-        )
 
     result, img_err, proc_err, _last_json = transcribe_to_dwc(
         raw,

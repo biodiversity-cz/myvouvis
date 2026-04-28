@@ -12,7 +12,17 @@ from vv_api import vv_runner
 RGB_WHOLE_SHEET = 1
 RGB_LABEL_ONLY = 0
 
-_IMG_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
+_IMG_EXT = {
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".webp",
+    ".gif",
+    ".bmp",
+    ".tif",
+    ".tiff",
+    ".jp2",
+}
 
 
 def collect_artifact_relpaths(artifact_root: pathlib.Path) -> List[str]:

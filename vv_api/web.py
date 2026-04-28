@@ -3,13 +3,15 @@ from __future__ import annotations
 import json
 import secrets
 from pathlib import Path
+from typing import Any
 from urllib.parse import quote
 
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from vv_api.config import get_settings
+from vv_api.config import Settings, get_settings
+from vv_api.media_types import ALLOWED_UPLOAD_SUFFIXES, upload_mimetype_ok
 from vv_api.pipeline import (
     RGB_WHOLE_SHEET,
     collect_artifact_relpaths,
@@ -28,19 +30,21 @@ def _artifact_hrefs(run_id: str, rels: list[str]) -> list[str]:
     return [base + quote(r, safe="/") for r in rels]
 
 
+def _upload_view_ctx(settings: Settings, error: str | None = None) -> dict[str, Any]:
+    """Context for upload.html; max_upload_bytes drives client-side size check."""
+    return {
+        "error": error,
+        "max_mb": round(settings.max_upload_bytes / (1024 * 1024)),
+        "max_upload_bytes": settings.max_upload_bytes,
+        "max_edge": settings.max_image_edge_px,
+        "resize_edge": settings.resize_max_edge_px,
+    }
+
+
 @router.get("/app", response_class=HTMLResponse)
 def app_upload(request: Request) -> HTMLResponse:
     s = get_settings()
-    return templates.TemplateResponse(
-        request,
-        "upload.html",
-        {
-            "error": None,
-            "max_mb": round(s.max_upload_bytes / (1024 * 1024)),
-            "max_edge": s.max_image_edge_px,
-            "resize_edge": s.resize_max_edge_px,
-        },
-    )
+    return templates.TemplateResponse(request, "upload.html", _upload_view_ctx(s))
 
 
 @router.post("/app/process", response_model=None)
@@ -49,12 +53,7 @@ def app_process(
     file: UploadFile | None = File(default=None),
 ) -> RedirectResponse | HTMLResponse:
     s = get_settings()
-    ctx = {
-        "error": None,
-        "max_mb": round(s.max_upload_bytes / (1024 * 1024)),
-        "max_edge": s.max_image_edge_px,
-        "resize_edge": s.resize_max_edge_px,
-    }
+    ctx = _upload_view_ctx(s)
 
     if not s.openai_api_key.strip():
         ctx["error"] = "Není nastaven OPENAI_API_KEY (e-INFRA / OpenAI-kompatibilní klíč)."
@@ -69,14 +68,18 @@ def app_process(
         ctx["error"] = "Vyberte prosím obrázek."
         return templates.TemplateResponse(request, "upload.html", ctx, status_code=400)
 
+    suffix = Path(file.filename).suffix.lower() or ".jpg"
+    if suffix not in ALLOWED_UPLOAD_SUFFIXES:
+        ctx["error"] = "Povolené formáty: JPEG, PNG, TIFF a JP2."
+        return templates.TemplateResponse(request, "upload.html", ctx, status_code=400)
+
+    if not upload_mimetype_ok(file.content_type):
+        ctx["error"] = "Povolené formáty: JPEG, PNG, TIFF a JP2."
+        return templates.TemplateResponse(request, "upload.html", ctx, status_code=415)
+
     raw = file.file.read()
     if not raw:
         ctx["error"] = "Soubor je prázdný."
-        return templates.TemplateResponse(request, "upload.html", ctx, status_code=400)
-
-    suffix = Path(file.filename).suffix.lower() or ".jpg"
-    if suffix not in (".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp", ".webp"):
-        ctx["error"] = "Nepodporovaný formát. Použijte JPEG, PNG, TIFF nebo WebP."
         return templates.TemplateResponse(request, "upload.html", ctx, status_code=400)
 
     run_id = secrets.token_urlsafe(16).replace(".", "_")
