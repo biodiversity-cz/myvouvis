@@ -10,7 +10,11 @@ from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeou
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from vv_api.config import Settings, get_settings
+from vv_api.config import (
+    OPENAI_LLM_PRESET_TO_MODEL_ID,
+    Settings,
+    get_settings,
+)
 
 _LOCK = threading.Lock()
 _CONFIGURED = False
@@ -102,6 +106,10 @@ def _apply_env(settings: Settings) -> None:
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = g
     if settings.openai_llm_model:
         os.environ["OPENAI_LLM_MODEL"] = settings.openai_llm_model
+    else:
+        os.environ["OPENAI_LLM_MODEL"] = OPENAI_LLM_PRESET_TO_MODEL_ID[
+            settings.openai_llm_preset
+        ]
 
 
 def run_voucher_vision_in_dirs(

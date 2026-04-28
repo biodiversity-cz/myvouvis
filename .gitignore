@@ -15,4 +15,5 @@ data/runs/
 
 # Kubernetes secrets (použijte secret.example.yaml jako šablonu)
 k8s/secret.yaml
+k8s/secret.example.yaml
 VENDOR.md

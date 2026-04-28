@@ -2,10 +2,21 @@ from __future__ import annotations
 
 import pathlib
 from functools import lru_cache
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+# e-INFRA (OpenAI-compatible) model ids — switch via OPENAI_LLM_PRESET (env).
+# OPENAI_LLM_MODEL still overrides both when set.
+OpenaiLlmPreset = Literal["gpt-oss-120b", "deepseek-v3.2-thinking", "qwen3.5-122b"]
+
+OPENAI_LLM_PRESET_TO_MODEL_ID: dict[OpenaiLlmPreset, str] = {
+    "gpt-oss-120b": "gpt-oss-120b",
+    "deepseek-v3.2-thinking": "deepseek-v3.2-thinking",
+    "qwen3.5-122b": "qwen3.5-122b",
+}
 
 
 def _default_vendor_root() -> pathlib.Path:
@@ -29,10 +40,14 @@ class Settings(BaseSettings):
 
     vendor_root: pathlib.Path = Field(default_factory=_default_vendor_root)
 
-    # LLM: OpenAI-compatible (e-INFRA CZ) — env: OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_LLM_MODEL
+    # LLM: OpenAI-compatible (e-INFRA CZ) — env:
+    #   OPENAI_API_KEY, OPENAI_BASE_URL,
+    #   OPENAI_LLM_PRESET (gpt-oss-120b | deepseek-v3.2-thinking | qwen3.5-122b),
+    #   or OPENAI_LLM_MODEL when you need an arbitrary model id (overrides preset).
     openai_api_key: str = ""
     openai_base_url: str = "https://llm.ai.e-infra.cz/v1/"
 
+    openai_llm_preset: OpenaiLlmPreset = "gpt-oss-120b"
     openai_llm_model: Optional[str] = None
 
     vv_llm_version: str = "GPT 4o mini 2024-07-18"

@@ -24,6 +24,9 @@ spec:
           env:
             - name: OPENAI_BASE_URL
               value: "https://llm.ai.e-infra.cz/v1/"
+            # Model switch (if not in Secret): gpt-oss-120b | deepseek-v3.2-thinking | qwen3.5-122b
+            # - name: OPENAI_LLM_PRESET
+            #   value: "gpt-oss-120b"
             - name: REQUEST_TIMEOUT_S
               value: "180"
           # Optional GPU: uncomment and use a cluster with nvidia.com/gpu
