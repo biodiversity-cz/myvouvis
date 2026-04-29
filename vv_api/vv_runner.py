@@ -30,7 +30,7 @@ def _install_openai_model_override() -> None:
     from vouchervision.model_maps import ModelMaps
 
     if not hasattr(ModelMaps, "_vv_orig_get_api_name"):
-        ModelMaps._vv_orig_get_api_name = ModelMaps.get_api_name.__func__  # type: ignore[assignment]
+        ModelMaps._vv_orig_get_api_name = ModelMaps.get_API_name.__func__  # type: ignore[assignment]
 
     o = os.environ.get("OPENAI_LLM_MODEL")
     if not o:
