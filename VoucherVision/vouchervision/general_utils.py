@@ -58,7 +58,9 @@ def num_tokens_from_string(string, encoding_name):
     return num_tokens
 
 def add_to_expense_report(dir_home, data):
-    path_expense_report = os.path.join(dir_home, 'expense_report','expense_report.csv')
+    expense_dir = os.path.join(dir_home, "expense_report")
+    validate_dir(expense_dir)
+    path_expense_report = os.path.join(expense_dir, "expense_report.csv")
 
     # Check if the file exists
     file_exists = os.path.isfile(path_expense_report)
