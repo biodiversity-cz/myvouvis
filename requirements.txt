@@ -10,5 +10,5 @@ pydantic>=2.8.0
 pydantic-settings>=2.2.0
 jinja2>=3.1.0
 
-# Upstream / README: PyTorch < 2.6 for some LM2 / LeafMachine2 workflows
-torch>=2.0.0,<2.6.0
+# PyTorch: >=2.6 required — torch.load change (CVE-2025-32434). Retest LM2/VoucherVision if regressions.
+torch>=2.6.0

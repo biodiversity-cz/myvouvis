@@ -1,8 +1,7 @@
-# Host + nginx ingress; TLS řeší cluster cert-manager (ClusterIssuer letsencrypt-prod — jako myhespi).
-# Max body musí být na Ingress vyšší než app limit (multipart overhead); myhepsi má 100m.
-# Načíst vždy kubectl apply ingress po změně.
-# Max upload aplikace: vv_api max_upload_bytes (20 MiB default).
-# Timeouts: align with gunicorn --timeout 180 and REQUEST_TIMEOUT_S=180.
+# Ingress zarovnaný na biodiversity-cz/myhespi (k8s/ingress.yaml tam v repu):
+#   stejné anotace velikosti těla + custom-http-errors + pathType ImplementationSpecific.
+# Max upload aplikace: vv_api max_upload_bytes (default 20 MiB) — nižší než 100m na Ingress.
+# Timeouts: align s gunicorn --timeout 180 a REQUEST_TIMEOUT_S=180.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -10,6 +9,7 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/custom-http-errors: "599"
     nginx.ingress.kubernetes.io/proxy-body-size: "100m"
     nginx.org/client-max-body-size: "100m"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "180"
@@ -26,7 +26,7 @@ spec:
       http:
         paths:
           - path: /
-            pathType: Prefix
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: vouvis-api
