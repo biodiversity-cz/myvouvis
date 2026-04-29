@@ -1,5 +1,7 @@
 # Host + nginx ingress; TLS řeší cluster cert-manager (ClusterIssuer letsencrypt-prod — jako myhespi).
-# Max upload 20 MiB (sjednoceno s vv_api max_upload_bytes a proxy-body).
+# Max body musí být na Ingress vyšší než app limit (multipart overhead); myhepsi má 100m.
+# Načíst vždy kubectl apply ingress po změně.
+# Max upload aplikace: vv_api max_upload_bytes (20 MiB default).
 # Timeouts: align with gunicorn --timeout 180 and REQUEST_TIMEOUT_S=180.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -8,8 +10,8 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     kubernetes.io/tls-acme: "true"
-    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
-    nginx.org/client-max-body-size: "20m"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.org/client-max-body-size: "100m"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "180"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "180"
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
