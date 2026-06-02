@@ -1,5 +1,7 @@
 # Python 3.13 (create venv: python3.13 -m venv .venv)
 # pip install -r requirements.txt   then: export PYTHONPATH=src
+# LM2 YOLOv5 uses pkg_resources; removed in setuptools>=82
+setuptools>=70,<=80.10.2
 openai>=1.40
 pydantic-settings>=2.2
 pyyaml>=6
@@ -10,6 +12,7 @@ torchvision>=0.21,<0.22
 numpy>=2
 opencv-python-headless>=4.10
 pandas>=2.2
+requests>=2.32
 tqdm>=4.66
 matplotlib>=3.9
 scipy>=1.14

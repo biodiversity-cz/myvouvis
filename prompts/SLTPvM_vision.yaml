@@ -23,7 +23,7 @@ rules:
   collectionDateEnd: End of date range if present.
   habitat: Habitat description.
   specimenDescription: Specimen notes (color, measurements, etc.).
-  cultivated: 'yes' if cultivated indicated.
+  cultivated: "If the text includes 'cult' or 'cultivated', set this field to yes."
   continent: Continent of collection.
   country: Country of collection.
   stateProvince: State or province.

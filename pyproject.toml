@@ -10,6 +10,8 @@ package-mode = false
 [tool.poetry.dependencies]
 # Align with coco-bbox-detector; PyTorch wheels available for 3.13 (not 3.14 yet).
 python = "^3.13"
+# pkg_resources removed in setuptools 82+ (LM2 component_detector)
+setuptools = ">=70,<=80.10.2"
 pydantic = "^2.8"
 pydantic-settings = "^2.2"
 pyyaml = "^6"
@@ -21,6 +23,7 @@ torchvision = ">=0.21,<0.22"
 numpy = "^2"
 opencv-python-headless = "^4.10"
 pandas = "^2.2"
+requests = "^2.32"
 tqdm = "^4.66"
 matplotlib = "^3.9"
 scipy = "^1.14"
