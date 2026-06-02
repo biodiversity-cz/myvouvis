@@ -37,4 +37,4 @@ Viz [docs/getting-started.md](docs/getting-started.md).
 
 **Výstup do DB:** jen `result_data.dwc` + `result_data.validation` — žádné bboxy.
 
-Po `vendorize_lm2.sh` a nastavení vah lze smazat `VoucherVision/` a `vv_api/`.
+LM2 detektor je vendored v `vendor/lm2/` (viz [NOTICE.md](NOTICE.md)).

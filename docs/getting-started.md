@@ -59,11 +59,9 @@ Pouze Darwin Core (žádné bboxy):
 }
 ```
 
-## Odstranění VoucherVision
+## LM2 váhy
 
 ```bash
-./scripts/vendorize_lm2.sh
-git lfs pull
-# ověřit: PYTHONPATH=src python -m cli test_image/test.png
-rm -rf VoucherVision vv_api
+git lfs pull   # vendor/lm2/weights/best.pt
+./scripts/vendorize_lm2.sh   # ověří vendor/lm2/component_detector
 ```

@@ -26,17 +26,13 @@ _ARCHIVAL_NAMES = (
 def _ensure_vendor_path(lm2_root: Path) -> None:
     """LM2 YOLOv5: component_detector must be importable from lm2_root."""
     root = lm2_root.resolve()
-    # Legacy layout: .../VoucherVision/vouchervision/component_detector
-    if (root / "component_detector" / "detect.py").is_file():
-        paths = [root]
-    elif (root.parent / "vouchervision" / "component_detector" / "detect.py").is_file():
-        paths = [root.parent / "vouchervision"]
-    else:
-        paths = [root]
-    for p in paths:
-        s = str(p)
-        if s not in sys.path:
-            sys.path.insert(0, s)
+    if not (root / "component_detector" / "detect.py").is_file():
+        raise FileNotFoundError(
+            f"LM2 component_detector not found under {root} (expected detect.py)."
+        )
+    s = str(root)
+    if s not in sys.path:
+        sys.path.insert(0, s)
 
 
 @lru_cache

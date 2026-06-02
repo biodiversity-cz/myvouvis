@@ -21,7 +21,7 @@ _REPO = Path(__file__).resolve().parent.parent
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
-    # Slim LM2 runtime under vendor/lm2 (see scripts/vendorize_lm2.sh). Legacy: VoucherVision/.
+    # LM2 YOLOv5 runtime under vendor/lm2 (override with LM2_ROOT).
     lm2_root: Path | None = None
     dwc_map_path: Path = Field(default=_REPO / "config" / "dwc_map.yaml")
     prompt_path: Path = Field(default=_REPO / "prompts" / "SLTPvM_vision.yaml")
@@ -50,7 +50,9 @@ class Settings(BaseSettings):
         slim = _REPO / "vendor" / "lm2"
         if (slim / "component_detector" / "detect.py").is_file():
             return slim
-        return _REPO / "VoucherVision" / "vouchervision"
+        raise FileNotFoundError(
+            f"LM2 vendor tree missing at {slim}. Clone with git lfs pull or set LM2_ROOT."
+        )
 
     def default_lm2_weights(self) -> Path:
         if self.lm2_weights_path:
