@@ -1,0 +1,37 @@
+prompt_name: SLTPvM_vision
+prompt_version: v-1-0
+instructions: |
+  1. Read the herbarium specimen label in the image and extract data into a JSON object.
+  2. Use only the JSON keys listed in the rules below; leave missing fields as empty strings.
+  3. All keys must be camelCase. Return valid JSON only, no explanation.
+json_formatting_instructions: Follow each field rule strictly. Correct minor OCR-like errors when obvious.
+rules:
+  catalogNumber: Barcode identifier, typically 6–30 digits.
+  scientificName: Full scientific name including genus and epithet.
+  genus: Genus, capitalized; or family name followed by 'indet' if genus absent.
+  specificEpithet: Species epithet only.
+  scientificNameAuthorship: Authorship per nomenclatural code.
+  collectedBy: Collectors, primary first, comma-separated.
+  collectorNumber: Collector's number.
+  identifiedBy: Determiners, not collectors.
+  identifiedDate: YYYY-MM-DD; use zeros for unknown parts.
+  identifiedConfidence: Short determination qualifiers (? cf. aff. etc.).
+  identifiedRemarks: Longer determination notes.
+  identificationHistory: Prior determinations with dates and determiners.
+  verbatimCollectionDate: Date exactly as on label.
+  collectionDate: YYYY-MM-DD normalized collection date.
+  collectionDateEnd: End of date range if present.
+  habitat: Habitat description.
+  specimenDescription: Specimen notes (color, measurements, etc.).
+  cultivated: 'yes' if cultivated indicated.
+  continent: Continent of collection.
+  country: Country of collection.
+  stateProvince: State or province.
+  county: County or equivalent.
+  locality: Locality description.
+  verbatimCoordinates: Coordinates as on label.
+  decimalLatitude: Decimal degrees latitude.
+  decimalLongitude: Decimal degrees longitude.
+  minimumElevationInMeters: Minimum elevation in meters.
+  maximumElevationInMeters: Maximum elevation in meters.
+  additionalText: Other label text not mapped above.

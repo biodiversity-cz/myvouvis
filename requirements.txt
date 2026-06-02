@@ -1,14 +1,23 @@
-# VoucherVision vendor (no Streamlit removal — upstream list)
--r VoucherVision/requirements.txt
-
-# API layer
-fastapi>=0.115.0
-uvicorn[standard]>=0.30.0
-gunicorn>=23.0.0
+# Python 3.13 (create venv: python3.13 -m venv .venv)
+# pip install -r requirements.txt   then: export PYTHONPATH=src
+openai>=1.40
+pydantic-settings>=2.2
+pyyaml>=6
+pillow>=11
+# Py3.13 wheels start at torch 2.6 (2.5 not published for cp313)
+torch>=2.6,<2.7
+torchvision>=0.21,<0.22
+numpy>=2
+opencv-python-headless>=4.10
+pandas>=2.2
+tqdm>=4.66
+matplotlib>=3.9
+scipy>=1.14
+seaborn>=0.13
+psycopg2-binary>=2.9
+boto3>=1.35
+flask>=3.0
+apscheduler>=3.10
+fastapi>=0.115
+uvicorn[standard]>=0.30
 python-multipart>=0.0.9
-pydantic>=2.8.0
-pydantic-settings>=2.2.0
-jinja2>=3.1.0
-
-# PyTorch: >=2.6 required — torch.load change (CVE-2025-32434). Retest LM2/VoucherVision if regressions.
-torch>=2.6.0

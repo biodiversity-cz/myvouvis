@@ -24,6 +24,8 @@ spec:
           # Workflow docker-publish.yml: ghcr.io + lowercase(repository); tag latest on main
           image: ghcr.io/biodiversity-cz/myvouvis:latest
           imagePullPolicy: Always
+          command: ["uvicorn"]
+          args: ["api.app:app", "--host", "0.0.0.0", "--port", "8080"]
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

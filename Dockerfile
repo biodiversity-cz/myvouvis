@@ -1,9 +1,9 @@
-# Synchronous VoucherVision API; GPU optional (CPU is slower for LM2, see VENDOR.md).
-FROM python:3.11-slim-bookworm
+# Herbarium DwC databot + optional HTTP API (e-infra / K8s).
+FROM python:3.13-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PYTHONPATH=/app/VoucherVision:/app
+    PYTHONPATH=/app/src:/app/vendor/lm2
 
 WORKDIR /app
 
@@ -12,23 +12,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /app/requirements.txt
-COPY VoucherVision/requirements.txt /app/VoucherVision/requirements.txt
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN pip install --no-cache-dir poetry==1.8.4
 
-RUN mkdir -p /app/data/runs
-COPY vv_api/ /app/vv_api/
-COPY VoucherVision/ /app/VoucherVision/
+COPY pyproject.toml /app/
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-interaction --no-ansi --only main
 
-# Non-root user (Kubernetes Pod Security restricted / runAsNonRoot)
-RUN groupadd -g 1000 appgroup && \
-    useradd -u 1000 -g appgroup -M -s /usr/sbin/nologin appuser && \
-    mkdir -p /app/.cache && \
-    chown -R appuser:appgroup /app
-ENV HOME=/app
+COPY src/ /app/src/
+COPY config/ /app/config/
+COPY prompts/ /app/prompts/
+# vendor/lm2: component_detector + weights/best.pt (LM2 acd, release v-2-3)
+COPY vendor/lm2/ /app/vendor/lm2/
 
+RUN groupadd -g 1000 appgroup \
+    && useradd -u 1000 -g appgroup -M -s /usr/sbin/nologin appuser \
+    && chown -R appuser:appgroup /app
 USER appuser
 
-# One worker: one long request; --timeout should align with ingress (~180s).
-EXPOSE 8080
-CMD ["gunicorn", "vv_api.main:app", "-k", "uvicorn.workers.UvicornWorker", "-w", "1", "-b", "0.0.0.0:8080", "--timeout", "180", "--graceful-timeout", "30", "--access-logfile", "-", "--error-logfile", "-"]
+EXPOSE 5000 8080
+ENTRYPOINT ["python", "src/main.py"]
+CMD []

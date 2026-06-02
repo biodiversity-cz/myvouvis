@@ -1,0 +1,36 @@
+# Map LLM JSON keys to Darwin Core term local names.
+version: 1
+
+field_map:
+  catalogNumber: catalogNumber
+  scientificName: scientificName
+  scientificNameAuthorship: scientificNameAuthorship
+  genus: genus
+  specificEpithet: specificEpithet
+  speciesNameAuthorship: scientificNameAuthorship
+  collectedBy: recordedBy
+  collectorNumber: recordNumber
+  identifiedBy: identifiedBy
+  identifiedDate: dateIdentified
+  identifiedConfidence: identificationRemarks
+  identifiedRemarks: identificationRemarks
+  identificationHistory: identificationRemarks
+  verbatimCollectionDate: verbatimEventDate
+  collectionDate: eventDate
+  collectionDateEnd: eventDate
+  habitat: habitat
+  specimenDescription: occurrenceRemarks
+  cultivated: establishmentMeans
+  continent: continent
+  country: country
+  stateProvince: stateProvince
+  county: county
+  locality: locality
+  verbatimCoordinates: verbatimCoordinates
+  decimalLatitude: decimalLatitude
+  decimalLongitude: decimalLongitude
+  minimumElevationInMeters: minimumElevationInMeters
+  maximumElevationInMeters: maximumElevationInMeters
+  additionalText: occurrenceRemarks
+
+required_terms: []

@@ -1,0 +1,18 @@
+application:
+  threads: 2
+  port: 5000
+  history: 5
+connection:
+  host: localhost
+  port: 5433
+  database: jacq_dev
+  user: databot
+  password: databot
+s3:
+  endpoint_url: http://localhost:9000
+  bucket: test-thumbs1280
+  access_key: test
+  secret_key: testSecret
+bots:
+  herbarium-dwc:
+    interval: "0 */6 * * *"

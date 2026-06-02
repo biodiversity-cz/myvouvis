@@ -1,0 +1,68 @@
+[tool.poetry]
+name = "myvouvis"
+version = "0.2.0"
+description = "Herbarium sheet → Darwin Core databot"
+authors = ["Biodiversity CZ"]
+readme = "README.md"
+# Application repo (coco pattern): deps via poetry install / requirements.txt, not pip install -e .
+package-mode = false
+
+[tool.poetry.dependencies]
+# Align with coco-bbox-detector; PyTorch wheels available for 3.13 (not 3.14 yet).
+python = "^3.13"
+pydantic = "^2.8"
+pydantic-settings = "^2.2"
+pyyaml = "^6"
+pillow = "^11"
+openai = "^1.40"
+# Py3.13: torch 2.5 wheels unavailable; LM2 YOLOv5 runs on 2.6.x
+torch = ">=2.6,<2.7"
+torchvision = ">=0.21,<0.22"
+numpy = "^2"
+opencv-python-headless = "^4.10"
+pandas = "^2.2"
+tqdm = "^4.66"
+matplotlib = "^3.9"
+scipy = "^1.14"
+seaborn = "^0.13"
+# databot runtime (coco pattern)
+psycopg2-binary = "^2.9"
+boto3 = "^1.35"
+flask = "^3.0"
+apscheduler = "^3.10"
+# optional HTTP
+fastapi = "^0.115"
+uvicorn = { extras = ["standard"], version = "^0.30" }
+python-multipart = "^0.0.9"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.8"
+mypy = "^1.13"
+types-pyyaml = "^6.0"
+pytest = "^8.3"
+
+[tool.pytest.ini_options]
+addopts = "-p no:recording -p no:vcr"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/core/**" = ["E501", "I001"]
+"src/bots/base/**" = ["E501", "I001"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+packages = ["pipeline", "vendor", "bots", "core", "api", "config"]
+mypy_path = "src"
+explicit_package_bases = true
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
