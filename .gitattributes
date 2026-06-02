@@ -1,0 +1,1 @@
+vendor/lm2/weights/*.pt filter=lfs diff=lfs merge=lfs -text
