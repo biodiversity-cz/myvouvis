@@ -18,6 +18,7 @@ spec:
             - name: bot
               image: ghcr.io/biodiversity-cz/myvouvis:latest
               imagePullPolicy: Always
+              command: ["python", "src/main.py"]
               args: ["herbarium-dwc"]
               envFrom:
                 - secretRef:

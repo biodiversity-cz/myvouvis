@@ -60,13 +60,23 @@ command: ["uvicorn"]
 args: ["api.app:app", "--host", "0.0.0.0", "--port", "8080"]
 ```
 
-3. Nasazení:
+3. Nasazení (manifest nastaví **uvicorn na :8080** — bez toho image spustí špatný proces a probe selže):
 
 ```bash
 kubectl apply -f k8s/deployment.yaml -f k8s/service.yaml -f k8s/ingress.yaml
+kubectl rollout restart deployment/vouvis-api -n pokorny1-ns
 ```
 
 4. Po pushi na `main` se image rebuildne v GitHub Actions (váhy v image díky Git LFS).
+
+**Okamžitá oprava bez nového buildu** (pokud logy ukazují Flask na :5000):
+
+```bash
+kubectl patch deployment vouvis-api -n pokorny1-ns --type='json' -p='[
+  {"op":"replace","path":"/spec/template/spec/containers/0/command","value":["uvicorn"]},
+  {"op":"replace","path":"/spec/template/spec/containers/0/args","value":["api.app:app","--host","0.0.0.0","--port","8080"]}
+]'
+```
 
 ---
 

@@ -29,6 +29,8 @@ RUN groupadd -g 1000 appgroup \
     && chown -R appuser:appgroup /app
 USER appuser
 
-EXPOSE 5000 8080
-ENTRYPOINT ["python", "src/main.py"]
-CMD []
+EXPOSE 8080
+# Default: HTTP API (K8s probes on :8080). Batch: override command to
+# ["python", "src/main.py", "herbarium-dwc"]
+ENTRYPOINT ["uvicorn"]
+CMD ["api.app:app", "--host", "0.0.0.0", "--port", "8080"]
