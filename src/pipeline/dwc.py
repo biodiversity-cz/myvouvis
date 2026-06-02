@@ -1,11 +1,35 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Any
 
 import yaml
 
 from pipeline.types import DarwinCoreResult
+
+# DwC date terms we normalize after mapping (invalid LLM placeholders like 2003-00-00).
+_DWC_DATE_TERMS = frozenset({"dateIdentified", "eventDate"})
+
+_ISO_DATE_RE = re.compile(r"^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$")
+
+
+def normalize_iso_date(value: str) -> str:
+    """Convert LLM date placeholders to valid ISO 8601 partial dates."""
+    v = value.strip()
+    if not v:
+        return v
+    m = _ISO_DATE_RE.fullmatch(v)
+    if not m:
+        return v
+    year, month, day = m.group(1), m.group(2), m.group(3)
+    if month == "00" or day == "00":
+        if month in (None, "00") or month == "00":
+            return year
+        return f"{year}-{month}"
+    if day is None:
+        return year if month is None else f"{year}-{month}"
+    return f"{year}-{month}-{day}"
 
 
 def _load_spec(path: Path) -> dict[str, Any]:
@@ -54,6 +78,10 @@ def map_to_dwc(raw: Any, dwc_map_path: Path) -> DarwinCoreResult:
                 out[dst] = v
         else:
             out[dst] = v
+
+    for term in _DWC_DATE_TERMS:
+        if term in out and isinstance(out[term], str):
+            out[term] = normalize_iso_date(out[term])
 
     missing = [k for k in required if not out.get(k)]
     return DarwinCoreResult(

@@ -4,7 +4,8 @@ metadata:
   name: vouvis-api
   namespace: pokorny1-ns
 spec:
-  progressDeadlineSeconds: 1800
+  # First pull of large image (torch + LM2 weights) can exceed 10 min default
+  progressDeadlineSeconds: 1800  # 30 minutes
   replicas: 1
   selector:
     matchLabels:

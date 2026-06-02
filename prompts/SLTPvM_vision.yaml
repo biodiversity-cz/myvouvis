@@ -14,13 +14,13 @@ rules:
   collectedBy: Collectors, primary first, comma-separated.
   collectorNumber: Collector's number.
   identifiedBy: Determiners, not collectors.
-  identifiedDate: YYYY-MM-DD; use zeros for unknown parts.
+  identifiedDate: Date of determination. ISO 8601 only — full YYYY-MM-DD, or YYYY-MM if day unknown, or YYYY if only year (e.g. 2003). Never use 00 for month or day (not 2003-00-00). Empty string if no date on label.
   identifiedConfidence: Short determination qualifiers (? cf. aff. etc.).
   identifiedRemarks: Longer determination notes.
   identificationHistory: Prior determinations with dates and determiners.
   verbatimCollectionDate: Date exactly as on label.
-  collectionDate: YYYY-MM-DD normalized collection date.
-  collectionDateEnd: End of date range if present.
+  collectionDate: Collection date; same ISO rules as identifiedDate (YYYY, YYYY-MM, or YYYY-MM-DD; never -00-).
+  collectionDateEnd: End of collection date range; same ISO rules, or empty.
   habitat: Habitat description.
   specimenDescription: Specimen notes (color, measurements, etc.).
   cultivated: "If the text includes 'cult' or 'cultivated', set this field to yes."
