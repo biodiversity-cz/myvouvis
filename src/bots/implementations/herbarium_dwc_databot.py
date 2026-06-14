@@ -13,7 +13,7 @@ class HerbariumDwcDatabot(AbstractDatabot):
     NAME = "herbarium-dwc"
     DESCRIPTION = (
         "Herbarium sheet → vision LLM → Darwin Core terms in databot_results "
-        "(dwc + validation only, no geometry)."
+        "(dwc + validation + LM2 bounding boxes)."
     )
     VERSION = 1
     ROLE = DatabotRole.SCANNER

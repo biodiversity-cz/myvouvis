@@ -35,6 +35,6 @@ Viz [docs/getting-started.md](docs/getting-started.md).
 | `src/vendor/lm2.py` | Jediný most k LM2 YOLOv5 |
 | `vendor/lm2/` | `component_detector/` + `weights/best.pt` (Git LFS) |
 
-**Výstup do DB:** jen `result_data.dwc` + `result_data.validation` — žádné bboxy.
+**Výstup do DB:** `result_data.dwc` + `result_data.validation` + LM2 bboxy (`detections`, `primary_label`).
 
 LM2 detektor je vendored v `vendor/lm2/` (viz [NOTICE.md](NOTICE.md)).

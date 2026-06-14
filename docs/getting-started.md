@@ -50,12 +50,21 @@ Váhy LM2 jsou v Docker image — bez PVC. Viz [INSTALL-K8S.md](../INSTALL-K8S.m
 
 ## Výstup v DB
 
-Pouze Darwin Core (žádné bboxy):
+Darwin Core + LM2 bounding boxy (pixely, xyxy):
 
 ```json
 {
   "dwc": { "scientificName": "...", "recordedBy": "..." },
-  "validation": { "ok": true, "missing": [] }
+  "validation": { "ok": true, "missing": [] },
+  "detections": [
+    { "bbox": [3120, 45, 3890, 210], "category": "barcode", "confidence": 0.94 },
+    { "bbox": [2850, 420, 3920, 1180], "category": "label", "confidence": 0.88 }
+  ],
+  "primary_label": {
+    "bbox": [2850, 420, 3920, 1180],
+    "category": "label",
+    "confidence": 0.88
+  }
 }
 ```
 

@@ -18,6 +18,13 @@ class Detection:
         x1, y1, x2, y2 = self.bbox
         return max(0, x2 - x1) * max(0, y2 - y1)
 
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "bbox": list(self.bbox),
+            "category": self.category,
+            "confidence": self.confidence,
+        }
+
 
 @dataclass(frozen=True, slots=True)
 class DarwinCoreResult:
@@ -27,15 +34,19 @@ class DarwinCoreResult:
 
 @dataclass(frozen=True, slots=True)
 class SheetResult:
-    """Internal pipeline state; only DwC is persisted to databot_results."""
+    """Pipeline result persisted to databot_results as DwC + LM2 geometry."""
 
     darwin_core: DarwinCoreResult
+    detections: tuple[Detection, ...]
+    primary_label: Detection
 
     def as_score(self) -> dict[str, Any]:
-        """PostgreSQL result_data: DwC terms + lightweight validation only."""
+        """PostgreSQL result_data: DwC, validation, and LM2 bounding boxes."""
         return {
             "dwc": self.darwin_core.dwc,
             "validation": self.darwin_core.validation,
+            "detections": [d.as_dict() for d in self.detections],
+            "primary_label": self.primary_label.as_dict(),
         }
 
 

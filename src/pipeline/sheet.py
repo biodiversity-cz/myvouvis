@@ -15,4 +15,8 @@ def process_sheet(path: Path, *, deps: PipelineDeps | None = None) -> SheetResul
     primary = select_primary_label(detections, label_category=d.label_category)
     crop_bytes, mime = crop_label(image_path, primary)
     raw = d.llm(crop_bytes, mime)
-    return SheetResult(darwin_core=map_to_dwc(raw, d.settings.dwc_map_path))
+    return SheetResult(
+        darwin_core=map_to_dwc(raw, d.settings.dwc_map_path),
+        detections=detections,
+        primary_label=primary,
+    )
