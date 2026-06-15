@@ -20,3 +20,4 @@ VENDOR.md
 test_images/
 .ruff_cache/
 .benchmarks/
+INSTALL-K8S.md

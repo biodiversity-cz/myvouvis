@@ -2,6 +2,8 @@
 
 Tenký databot: celý arch → LM2 detekce štítku → vision LLM (e-infra) → Darwin Core JSON do `databots.databot_results`.
 
+Vstup: JPEG/PNG/WebP přímo; pyramid TIFF (`.tif`) — pipeline vybere největší úroveň pyramidy.
+
 ## Lokálně
 
 Requires **Python 3.13** (same as coco-bbox-detector; 3.11 was only a temporary local fallback).

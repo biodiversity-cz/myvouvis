@@ -6,6 +6,7 @@ openai>=1.40
 pydantic-settings>=2.2
 pyyaml>=6
 pillow>=11
+tifffile>=2024
 # Py3.13 wheels start at torch 2.6 (2.5 not published for cp313)
 torch>=2.6,<2.7
 torchvision>=0.21,<0.22
