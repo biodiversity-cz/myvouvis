@@ -38,10 +38,22 @@ PYTHONPATH=src poetry run python src/main.py herbarium-dwc
 
 ## HTTP (test)
 
+Tři endpointy — stejný upload, jiný tvar odpovědi:
+
+| Endpoint | Výstup | Pipeline |
+|----------|--------|----------|
+| `POST /v1/transcribe-full` | DwC + validation + bbox | LM2 + LLM |
+| `POST /v1/transcribe-dwc` | DwC + validation | LM2 + LLM |
+| `POST /v1/transcribe-bbox` | detections + primary_label | jen LM2 |
+
 ```bash
 PYTHONPATH=src poetry run uvicorn api.app:app --host 0.0.0.0 --port 8080
-curl -F "file=@test_image/test.png" http://localhost:8080/v1/transcribe
+curl -F "file=@test_image/test.png" http://localhost:8080/v1/transcribe-full
+curl -F "file=@test_image/test.png" http://localhost:8080/v1/transcribe-dwc
+curl -F "file=@test_image/test.png" http://localhost:8080/v1/transcribe-bbox
 ```
+
+Batch databot: env **`OUTPUT_MODE=full|dwc|bbox`** (default `full`).
 
 ## K8s
 

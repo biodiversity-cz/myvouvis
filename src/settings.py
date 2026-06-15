@@ -7,6 +7,8 @@ from typing import Literal
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from pipeline.types import OutputMode
+
 OpenaiLlmPreset = Literal["gpt-oss-120b", "deepseek-v3.2-thinking", "qwen3.5-122b"]
 
 PRESET_TO_MODEL: dict[OpenaiLlmPreset, str] = {
@@ -36,6 +38,8 @@ class Settings(BaseSettings):
     lm2_device: str = ""
 
     label_category: str = "label"
+
+    output_mode: OutputMode = OutputMode.full
 
     request_timeout_s: int = 180
 

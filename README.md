@@ -4,15 +4,14 @@ Herbarijní **DwC databot**: celý arch → LM2 detekce primárního štítku �
 
 ## Rychlý start
 
-Python **3.13** recommended (see coco-bbox-detector). **`pip install -e .` nefunguje** — projekt je aplikace (`package-mode = false`), ne pip balíček. Použijte:
-
+Python **3.13** recommended: 
 ```bash
 python3.13 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 export PYTHONPATH=src
 ```
 
-Or Poetry:
+nebo Poetry:
 
 ```bash
 poetry env use python3.13
@@ -31,7 +30,7 @@ Viz [docs/getting-started.md](docs/getting-started.md).
 |-------|------|
 | `src/pipeline/sheet.py` | Jádro `process_sheet()` |
 | `src/bots/implementations/herbarium_dwc_databot.py` | Batch databot adapter |
-| `src/api/app.py` | HTTP `/v1/transcribe` (test) |
+| `src/api/app.py` | HTTP `/v1/transcribe-full`, `/v1/transcribe-dwc`, `/v1/transcribe-bbox` |
 | `src/vendor/lm2.py` | Jediný most k LM2 YOLOv5 |
 | `vendor/lm2/` | `component_detector/` + `weights/best.pt` (Git LFS) |
 

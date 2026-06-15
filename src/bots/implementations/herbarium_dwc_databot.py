@@ -6,6 +6,7 @@ from bots.base.abstract import AbstractDatabot
 from core.domain.DatabotRole import DatabotRole
 from pipeline.deps import PipelineDeps
 from pipeline.sheet import process_sheet
+from pipeline.types import OutputMode
 from utils.types import Score
 
 
@@ -23,4 +24,9 @@ class HerbariumDwcDatabot(AbstractDatabot):
         super().__init__()
 
     def compute(self, image_local_path: str) -> Score:
-        return process_sheet(Path(image_local_path), deps=self._deps).as_score()
+        mode = self._deps.settings.output_mode
+        return process_sheet(
+            Path(image_local_path),
+            deps=self._deps,
+            output_mode=mode,
+        ).as_score(mode)
