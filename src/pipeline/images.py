@@ -49,7 +49,7 @@ def _largest_pyramid_array(path: Path) -> np.ndarray:
                 page = max(tif.pages, key=lambda p: _level_area(p.shape))
                 return page.asarray()
     except (OSError, ValueError, tifffile.TiffFileError) as exc:
-        raise PipelineError(f"Cannot read TIFF: {path}") from exc
+        raise PipelineError(f"Cannot read TIFF {path.name}: {exc}") from exc
     raise PipelineError(f"No image levels in TIFF: {path}")
 
 

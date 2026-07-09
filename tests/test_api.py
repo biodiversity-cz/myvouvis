@@ -8,6 +8,20 @@ from api.app import app
 from pipeline.types import OutputMode
 
 
+def test_pipeline_error_returns_500_with_message() -> None:
+    client = TestClient(app)
+    with patch(
+        "api.app.process_sheet",
+        side_effect=ValueError("<COMPRESSION.LZW: 5> requires the 'imagecodecs' package"),
+    ):
+        response = client.post(
+            "/v1/transcribe-full",
+            files={"file": ("sheet.tif", b"fake", "image/tiff")},
+        )
+    assert response.status_code == 500
+    assert "imagecodecs" in response.json()["error"]
+
+
 def test_transcribe_routes_call_process_sheet_with_mode() -> None:
     mock_result = MagicMock()
     mock_result.as_score.return_value = {"ok": True}

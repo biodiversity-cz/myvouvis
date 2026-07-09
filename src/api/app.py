@@ -35,6 +35,8 @@ async def _transcribe_upload(
     try:
         result = process_sheet(tmp_path, output_mode=output_mode)
         return JSONResponse(result.as_score(output_mode))
+    except Exception as exc:
+        return JSONResponse({"error": str(exc)}, status_code=500)
     finally:
         tmp_path.unlink(missing_ok=True)
 
