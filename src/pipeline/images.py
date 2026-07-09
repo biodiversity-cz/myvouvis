@@ -11,6 +11,11 @@ from PIL import Image
 
 from pipeline.exceptions import PipelineError
 
+# Herbarium sheets at 600 dpi easily exceed PIL's default ~89 MP limit.
+# Raise to 400 MP to avoid false-positive warnings while keeping the
+# built-in DecompressionBombError active for truly oversized inputs (> 800 MP).
+Image.MAX_IMAGE_PIXELS = 400_000_000
+
 _TIFF_SUFFIXES = frozenset({".tif", ".tiff"})
 _JPEG_QUALITY = 92
 
