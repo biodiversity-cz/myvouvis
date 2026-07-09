@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
 from typing import Any, Protocol
@@ -46,6 +46,8 @@ class SheetResult:
     darwin_core: DarwinCoreResult
     detections: tuple[Detection, ...]
     primary_label: Detection
+    timing: dict[str, float | None] = field(default_factory=dict)
+    llm_version: str | None = None
 
     def as_score(self, output_mode: OutputMode = OutputMode.full) -> dict[str, Any]:
         """Serialize result; shape depends on output_mode."""
@@ -56,6 +58,10 @@ class SheetResult:
         if output_mode in (OutputMode.full, OutputMode.bbox):
             out["detections"] = [d.as_dict() for d in self.detections]
             out["primary_label"] = self.primary_label.as_dict()
+        if self.llm_version is not None:
+            out["llm_version"] = self.llm_version
+        if self.timing:
+            out["timing"] = self.timing
         return out
 
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from pathlib import Path
 
 from pipeline.deps import PipelineDeps, default_deps
@@ -16,19 +17,40 @@ def process_sheet(
     output_mode: OutputMode = OutputMode.full,
 ) -> SheetResult:
     d = deps or default_deps()
+    t_start = time.perf_counter()
     with materialize_sheet_path(path) as work_path:
+        t0 = time.perf_counter()
         detections = d.detector(work_path)
+        detection_s = time.perf_counter() - t0
+
         primary = select_primary_label(detections, label_category=d.label_category)
+
         if output_mode == OutputMode.bbox:
             return SheetResult(
                 darwin_core=DarwinCoreResult(dwc={}, validation={"ok": True, "missing": []}),
                 detections=detections,
                 primary_label=primary,
+                timing={
+                    "detection_s": round(detection_s, 3),
+                    "llm_s": None,
+                    "total_s": round(time.perf_counter() - t_start, 3),
+                },
             )
+
         crop_bytes, mime = crop_label(work_path, primary)
+
+        t0 = time.perf_counter()
         raw = d.llm(crop_bytes, mime)
+        llm_s = time.perf_counter() - t0
+
         return SheetResult(
             darwin_core=map_to_dwc(raw, d.settings.dwc_map_path),
             detections=detections,
             primary_label=primary,
+            llm_version=d.settings.resolved_llm_model(),
+            timing={
+                "detection_s": round(detection_s, 3),
+                "llm_s": round(llm_s, 3),
+                "total_s": round(time.perf_counter() - t_start, 3),
+            },
         )
