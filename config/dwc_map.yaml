@@ -32,5 +32,6 @@ field_map:
   minimumElevationInMeters: minimumElevationInMeters
   maximumElevationInMeters: maximumElevationInMeters
   additionalText: occurrenceRemarks
+  labelType: labelType
 
 required_terms: []

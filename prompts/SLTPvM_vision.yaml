@@ -1,5 +1,5 @@
 prompt_name: SLTPvM_vision
-prompt_version: v-1-0
+prompt_version: v-1-1
 instructions: |
   1. Read the herbarium specimen label in the image and extract data into a JSON object.
   2. Use only the JSON keys listed in the rules below; leave missing fields as empty strings.
@@ -35,3 +35,7 @@ rules:
   minimumElevationInMeters: Minimum elevation in meters.
   maximumElevationInMeters: Maximum elevation in meters.
   additionalText: Other label text not mapped above.
+  labelType: >
+    Type of label writing. Use exactly one of: "handwritten" (text written by hand),
+    "printed" (typeset or machine-printed text), "mixed" (combination of both),
+    or "unknown" (cannot determine).
