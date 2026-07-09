@@ -3,11 +3,18 @@ from __future__ import annotations
 import time
 from pathlib import Path
 
+from PIL import Image
+
 from pipeline.deps import PipelineDeps, default_deps
 from pipeline.dwc import map_to_dwc
-from pipeline.images import materialize_sheet_path
+from pipeline.images import is_multipage_tiff, is_tiff_path, materialize_sheet_path
 from pipeline.labels import crop_label, select_primary_label
 from pipeline.types import DarwinCoreResult, OutputMode, SheetResult
+
+
+def _image_size(image_path: Path) -> tuple[int, int]:
+    with Image.open(image_path) as im:
+        return im.size  # (width, height)
 
 
 def process_sheet(
@@ -17,6 +24,7 @@ def process_sheet(
     output_mode: OutputMode = OutputMode.full,
 ) -> SheetResult:
     d = deps or default_deps()
+    multipage = is_tiff_path(path) and is_multipage_tiff(path)
     t_start = time.perf_counter()
     with materialize_sheet_path(path) as work_path:
         t0 = time.perf_counter()
@@ -24,12 +32,16 @@ def process_sheet(
         detection_s = time.perf_counter() - t0
 
         primary = select_primary_label(detections, label_category=d.label_category)
+        image_size = _image_size(work_path)
 
         if output_mode == OutputMode.bbox:
             return SheetResult(
                 darwin_core=DarwinCoreResult(dwc={}, validation={"ok": True, "missing": []}),
                 detections=detections,
                 primary_label=primary,
+                image_name=path.name,
+                image_size=image_size,
+                multipage=multipage,
                 timing={
                     "detection_s": round(detection_s, 3),
                     "llm_s": None,
@@ -47,6 +59,9 @@ def process_sheet(
             darwin_core=map_to_dwc(raw, d.settings.dwc_map_path),
             detections=detections,
             primary_label=primary,
+            image_name=path.name,
+            image_size=image_size,
+            multipage=multipage,
             llm_version=d.settings.resolved_llm_model(),
             timing={
                 "detection_s": round(detection_s, 3),

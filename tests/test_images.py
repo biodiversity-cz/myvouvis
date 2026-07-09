@@ -6,7 +6,7 @@ import numpy as np
 import tifffile
 from PIL import Image
 
-from pipeline.images import materialize_sheet_path
+from pipeline.images import is_multipage_tiff, materialize_sheet_path
 
 
 def _write_pyramid_tiff(path: Path, large: tuple[int, int], small: tuple[int, int]) -> None:
@@ -15,6 +15,36 @@ def _write_pyramid_tiff(path: Path, large: tuple[int, int], small: tuple[int, in
     with tifffile.TiffWriter(path) as tif:
         tif.write(big, photometric="rgb", subifds=1)
         tif.write(thumb, photometric="rgb")
+
+
+def _write_multipage_tiff(path: Path, n_pages: int = 2) -> None:
+    with tifffile.TiffWriter(path) as tif:
+        for _ in range(n_pages):
+            tif.write(np.zeros((100, 100, 3), dtype=np.uint8), photometric="rgb")
+
+
+def test_is_multipage_tiff_true(tmp_path: Path) -> None:
+    tiff = tmp_path / "multi.tif"
+    _write_multipage_tiff(tiff, n_pages=2)
+    assert is_multipage_tiff(tiff) is True
+
+
+def test_is_multipage_tiff_false_for_pyramid(tmp_path: Path) -> None:
+    tiff = tmp_path / "pyramid.tif"
+    _write_pyramid_tiff(tiff, large=(400, 300), small=(100, 100))
+    assert is_multipage_tiff(tiff) is False
+
+
+def test_is_multipage_tiff_false_for_single_page(tmp_path: Path) -> None:
+    tiff = tmp_path / "single.tif"
+    _write_multipage_tiff(tiff, n_pages=1)
+    assert is_multipage_tiff(tiff) is False
+
+
+def test_is_multipage_tiff_false_for_non_tiff(tmp_path: Path) -> None:
+    png = tmp_path / "sheet.png"
+    Image.new("RGB", (50, 40), color="red").save(png)
+    assert is_multipage_tiff(png) is False
 
 
 def test_non_tiff_unchanged(tmp_path: Path) -> None:

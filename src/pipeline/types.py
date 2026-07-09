@@ -5,6 +5,8 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any, Protocol
 
+from pipeline.coco import to_coco
+
 
 class OutputMode(StrEnum):
     full = "full"
@@ -48,6 +50,9 @@ class SheetResult:
     primary_label: Detection
     timing: dict[str, float | None] = field(default_factory=dict)
     llm_version: str | None = None
+    image_name: str = "sheet.jpg"
+    image_size: tuple[int, int] | None = None
+    multipage: bool = False
 
     def as_score(self, output_mode: OutputMode = OutputMode.full) -> dict[str, Any]:
         """Serialize result; shape depends on output_mode."""
@@ -58,10 +63,13 @@ class SheetResult:
         if output_mode in (OutputMode.full, OutputMode.bbox):
             out["detections"] = [d.as_dict() for d in self.detections]
             out["primary_label"] = self.primary_label.as_dict()
+            out["coco"] = to_coco(self.detections, self.image_name, self.image_size)
         if self.llm_version is not None:
             out["llm_version"] = self.llm_version
         if self.timing:
             out["timing"] = self.timing
+        if self.multipage:
+            out["multipage"] = True
         return out
 
 

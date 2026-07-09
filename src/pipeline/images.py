@@ -19,6 +19,20 @@ def is_tiff_path(path: Path) -> bool:
     return path.suffix.casefold() in _TIFF_SUFFIXES
 
 
+def is_multipage_tiff(path: Path) -> bool:
+    """Return True when the TIFF contains more than one document page.
+
+    Pyramid TIFFs store lower resolutions as sub-IFDs, which tifffile does not
+    count in tif.pages — so len(tif.pages) > 1 reliably identifies multi-page
+    documents while leaving pyramid TIFFs unaffected.
+    """
+    try:
+        with tifffile.TiffFile(path) as tif:
+            return len(tif.pages) > 1
+    except (OSError, ValueError, tifffile.TiffFileError):
+        return False
+
+
 def _level_area(shape: tuple[int, ...]) -> int:
     if len(shape) < 2:
         return 0
