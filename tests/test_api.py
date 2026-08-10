@@ -42,5 +42,6 @@ def test_transcribe_routes_call_process_sheet_with_mode() -> None:
             assert response.status_code == 200, path
             process.assert_called_once()
             assert process.call_args.kwargs["output_mode"] == mode
+            assert process.call_args.kwargs["image_name"] == "sheet.png"
             mock_result.as_score.assert_called_with(mode)
             mock_result.reset_mock()

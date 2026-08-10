@@ -60,6 +60,8 @@ class SheetResult:
         if output_mode in (OutputMode.full, OutputMode.dwc):
             out["dwc"] = self.darwin_core.dwc
             out["validation"] = self.darwin_core.validation
+            # Always present; derived from dwc.labelType (handwritten|mixed → True).
+            out["handwritten"] = _is_handwritten(self.darwin_core.dwc)
         if output_mode in (OutputMode.full, OutputMode.bbox):
             out["detections"] = [d.as_dict() for d in self.detections]
             out["primary_label"] = self.primary_label.as_dict()
@@ -71,6 +73,10 @@ class SheetResult:
         if self.multipage:
             out["multipage"] = True
         return out
+
+
+def _is_handwritten(dwc: dict[str, Any]) -> bool:
+    return str(dwc.get("labelType", "")).casefold() in {"handwritten", "mixed"}
 
 
 class Detector(Protocol):

@@ -38,5 +38,8 @@ def test_process_sheet_bbox_skips_llm(tmp_path: Path) -> None:
 
     assert llm_calls == 0
     score = result.as_score(OutputMode.bbox)
-    assert set(score.keys()) == {"detections", "primary_label"}
     assert score["primary_label"]["bbox"] == [10, 10, 50, 50]
+    assert "detections" in score
+    assert "coco" in score
+    assert score["coco"]["images"][0]["file_name"] == "sheet.png"
+    assert "bbox_normalized" in score["coco"]["annotations"][0]

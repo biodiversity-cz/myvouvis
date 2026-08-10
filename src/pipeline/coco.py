@@ -25,11 +25,12 @@ def _detection_to_annotation(
     detection: Detection,
     ann_id: int,
     image_id: int,
+    image_size: tuple[int, int] | None = None,
 ) -> dict[str, Any]:
     x1, y1, x2, y2 = detection.bbox
     w = x2 - x1
     h = y2 - y1
-    return {
+    ann: dict[str, Any] = {
         "id": ann_id,
         "image_id": image_id,
         "category_id": _CATEGORY_ID.get(detection.category, 0),
@@ -38,6 +39,16 @@ def _detection_to_annotation(
         "iscrowd": 0,
         "score": round(detection.confidence, 5),
     }
+    if image_size is not None:
+        iw, ih = image_size
+        if iw > 0 and ih > 0:
+            ann["bbox_normalized"] = [
+                round(x1 / iw, 6),
+                round(y1 / ih, 6),
+                round(w / iw, 6),
+                round(h / ih, 6),
+            ]
+    return ann
 
 
 def to_coco(
@@ -53,7 +64,7 @@ def to_coco(
         image_entry["height"] = image_size[1]
 
     annotations = [
-        _detection_to_annotation(d, ann_id=i + 1, image_id=image_id)
+        _detection_to_annotation(d, ann_id=i + 1, image_id=image_id, image_size=image_size)
         for i, d in enumerate(detections)
     ]
 

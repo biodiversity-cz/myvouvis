@@ -16,7 +16,8 @@ pydantic = "^2.8"
 pydantic-settings = "^2.2"
 pyyaml = "^6"
 pillow = "^11"
-tifffile = "^2024"
+# codecs extra → imagecodecs (LZW, JPEG, Deflate, PackBits, JPEG2000, …)
+tifffile = { version = "^2024", extras = ["codecs"] }
 openai = "^1.40"
 # Py3.13: torch 2.5 wheels unavailable; LM2 YOLOv5 runs on 2.6.x
 torch = ">=2.6,<2.7"

@@ -22,8 +22,10 @@ def process_sheet(
     *,
     deps: PipelineDeps | None = None,
     output_mode: OutputMode = OutputMode.full,
+    image_name: str | None = None,
 ) -> SheetResult:
     d = deps or default_deps()
+    display_name = image_name or path.name
     multipage = is_tiff_path(path) and is_multipage_tiff(path)
     t_start = time.perf_counter()
     with materialize_sheet_path(path) as work_path:
@@ -39,7 +41,7 @@ def process_sheet(
                 darwin_core=DarwinCoreResult(dwc={}, validation={"ok": True, "missing": []}),
                 detections=detections,
                 primary_label=primary,
-                image_name=path.name,
+                image_name=display_name,
                 image_size=image_size,
                 multipage=multipage,
                 timing={
@@ -59,7 +61,7 @@ def process_sheet(
             darwin_core=map_to_dwc(raw, d.settings.dwc_map_path),
             detections=detections,
             primary_label=primary,
-            image_name=path.name,
+            image_name=display_name,
             image_size=image_size,
             multipage=multipage,
             llm_version=d.settings.resolved_llm_model(),

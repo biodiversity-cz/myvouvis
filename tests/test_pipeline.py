@@ -28,6 +28,7 @@ def test_map_to_dwc_normalizes_date_identified() -> None:
     result = map_to_dwc(raw, _DWC_MAP)
     assert result.dwc["dateIdentified"] == "2003"
     assert result.dwc["identifiedBy"] == "A. B."
+    assert result.dwc["labelType"] == "unknown"
 
 
 def test_map_to_dwc_maps_collected_by() -> None:
@@ -35,4 +36,11 @@ def test_map_to_dwc_maps_collected_by() -> None:
     result = map_to_dwc(raw, _DWC_MAP)
     assert result.dwc["recordedBy"] == "Darwin"
     assert result.dwc["scientificName"] == "Homo sapiens"
+    assert result.dwc["labelType"] == "unknown"
     assert result.validation["ok"] is True
+
+
+def test_map_to_dwc_preserves_label_type() -> None:
+    raw = {"labelType": "mixed", "scientificName": "Melica picta"}
+    result = map_to_dwc(raw, _DWC_MAP)
+    assert result.dwc["labelType"] == "mixed"

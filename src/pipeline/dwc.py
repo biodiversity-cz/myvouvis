@@ -56,7 +56,7 @@ def map_to_dwc(raw: Any, dwc_map_path: Path) -> DarwinCoreResult:
     rec = _extract_record(raw)
     if not rec:
         return DarwinCoreResult(
-            dwc={},
+            dwc={"labelType": "unknown"},
             validation={
                 "ok": False,
                 "missing": required[:],
@@ -84,6 +84,9 @@ def map_to_dwc(raw: Any, dwc_map_path: Path) -> DarwinCoreResult:
             out[term] = normalize_iso_date(out[term])
 
     missing = [k for k in required if not out.get(k)]
+    # Always emit labelType so clients can rely on the key (and handwritten flag).
+    if not out.get("labelType"):
+        out["labelType"] = "unknown"
     return DarwinCoreResult(
         dwc=out,
         validation={"ok": len(missing) == 0, "missing": missing},

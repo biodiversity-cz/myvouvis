@@ -27,13 +27,18 @@ async def _transcribe_upload(
     file: UploadFile,
     output_mode: OutputMode,
 ) -> JSONResponse:
-    suffix = Path(file.filename or "upload.jpg").suffix or ".jpg"
+    original_name = Path(file.filename or "upload.jpg").name
+    suffix = Path(original_name).suffix or ".jpg"
     data = await file.read()
     with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
         tmp.write(data)
         tmp_path = Path(tmp.name)
     try:
-        result = process_sheet(tmp_path, output_mode=output_mode)
+        result = process_sheet(
+            tmp_path,
+            output_mode=output_mode,
+            image_name=original_name,
+        )
         return JSONResponse(result.as_score(output_mode))
     except Exception as exc:
         return JSONResponse({"error": str(exc)}, status_code=500)
