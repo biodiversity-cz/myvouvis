@@ -53,10 +53,13 @@ class SheetResult:
     image_name: str = "sheet.jpg"
     image_size: tuple[int, int] | None = None
     multipage: bool = False
+    typus: bool = False
 
     def as_score(self, output_mode: OutputMode = OutputMode.full) -> dict[str, Any]:
         """Serialize result; shape depends on output_mode."""
         out: dict[str, Any] = {}
+        # Always present (detection-time flag; independent of output_mode).
+        out["typus"] = self.typus
         if output_mode in (OutputMode.full, OutputMode.dwc):
             out["dwc"] = self.darwin_core.dwc
             out["validation"] = self.darwin_core.validation

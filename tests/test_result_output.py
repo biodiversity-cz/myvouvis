@@ -21,6 +21,7 @@ def _sample_result() -> SheetResult:
 def test_as_score_full() -> None:
     score = _sample_result().as_score(OutputMode.full)
     assert set(score.keys()) == {
+        "typus",
         "dwc",
         "validation",
         "handwritten",
@@ -30,22 +31,40 @@ def test_as_score_full() -> None:
     }
     assert score["dwc"]["scientificName"] == "Bellis perennis"
     assert score["handwritten"] is False
+    assert score["typus"] is False
 
 
 def test_as_score_dwc_only() -> None:
     score = _sample_result().as_score(OutputMode.dwc)
-    assert set(score.keys()) == {"dwc", "validation", "handwritten"}
+    assert set(score.keys()) == {"typus", "dwc", "validation", "handwritten"}
     assert "detections" not in score
     assert "coco" not in score
     assert score["handwritten"] is False
+    assert score["typus"] is False
 
 
 def test_as_score_bbox_only() -> None:
     score = _sample_result().as_score(OutputMode.bbox)
-    assert set(score.keys()) == {"detections", "primary_label", "coco"}
+    assert set(score.keys()) == {"typus", "detections", "primary_label", "coco"}
     assert "dwc" not in score
     assert "handwritten" not in score
     assert score["primary_label"]["category"] == "label"
+    assert score["typus"] is False
+
+
+def test_typus_flag_in_all_modes() -> None:
+    primary = Detection(bbox=(100, 200, 300, 400), category="label", confidence=0.88)
+    result = SheetResult(
+        darwin_core=DarwinCoreResult(
+            dwc={"labelType": "printed"},
+            validation={"ok": True, "missing": []},
+        ),
+        detections=(primary,),
+        primary_label=primary,
+        typus=True,
+    )
+    for mode in OutputMode:
+        assert result.as_score(mode)["typus"] is True
 
 
 def test_handwritten_true_for_mixed_and_handwritten() -> None:

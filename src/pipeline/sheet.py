@@ -10,6 +10,7 @@ from pipeline.dwc import map_to_dwc
 from pipeline.images import is_multipage_tiff, is_tiff_path, materialize_sheet_path
 from pipeline.labels import crop_label, select_primary_label
 from pipeline.types import DarwinCoreResult, OutputMode, SheetResult
+from pipeline.typus import any_red_label
 
 
 def _image_size(image_path: Path) -> tuple[int, int]:
@@ -35,6 +36,7 @@ def process_sheet(
 
         primary = select_primary_label(detections, label_category=d.label_category)
         image_size = _image_size(work_path)
+        typus = any_red_label(work_path, detections, label_category=d.label_category)
 
         if output_mode == OutputMode.bbox:
             return SheetResult(
@@ -44,6 +46,7 @@ def process_sheet(
                 image_name=display_name,
                 image_size=image_size,
                 multipage=multipage,
+                typus=typus,
                 timing={
                     "detection_s": round(detection_s, 3),
                     "llm_s": None,
@@ -64,6 +67,7 @@ def process_sheet(
             image_name=display_name,
             image_size=image_size,
             multipage=multipage,
+            typus=typus,
             llm_version=d.settings.resolved_llm_model(),
             timing={
                 "detection_s": round(detection_s, 3),
