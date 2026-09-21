@@ -9,7 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from pipeline.types import OutputMode
 
-OpenaiLlmPreset = Literal["gpt-oss-120b", "deepseek-v3.2-thinking", "qwen3.5-122b"]
+OpenaiLlmPreset = Literal["gpt-oss-120b", "deepseek-v3.2-thinking", "qwen3.5-122b", "qwen3.8-27b"]
 
 PRESET_TO_MODEL: dict[OpenaiLlmPreset, str] = {
     "gpt-oss-120b": "gpt-oss-120b",
