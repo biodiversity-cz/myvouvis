@@ -15,6 +15,7 @@ PRESET_TO_MODEL: dict[OpenaiLlmPreset, str] = {
     "gpt-oss-120b": "gpt-oss-120b",
     "deepseek-v3.2-thinking": "deepseek-v3.2-thinking",
     "qwen3.5-122b": "qwen3.5-122b",
+    "qwen3.8-27b": "qwen3.8-27b"
 }
 
 _REPO = Path(__file__).resolve().parent.parent
