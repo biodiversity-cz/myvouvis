@@ -78,3 +78,37 @@ def test_tiff_temp_cleaned_up(tmp_path: Path) -> None:
 
     assert temp_path is not None
     assert not temp_path.exists()
+
+
+def test_tiff_16bit_rgb_materializes(tmp_path: Path) -> None:
+    tiff = tmp_path / "sheet16.tif"
+    data = np.zeros((300, 400, 3), dtype=np.uint16)
+    data[..., 0] = 0xFFFF  # red
+
+    with tifffile.TiffWriter(tiff) as tif:
+        tif.write(data, photometric="rgb")
+
+    with materialize_sheet_path(tiff) as work_path:
+        assert work_path.suffix == ".jpg"
+        with Image.open(work_path) as im:
+            rgb = np.asarray(im.convert("RGB"))
+
+    assert rgb.shape == (300, 400, 3)
+    assert rgb[150, 200, 0] > 200  # red channel survives 16 -> 8 bit shift
+    assert rgb[150, 200, 1] < 55
+    assert rgb[150, 200, 2] < 55
+
+
+def test_tiff_16bit_grayscale_materializes(tmp_path: Path) -> None:
+    tiff = tmp_path / "gray16.tif"
+
+    with tifffile.TiffWriter(tiff) as tif:
+        tif.write(np.full((100, 80), 0x8000, dtype=np.uint16))
+
+    with materialize_sheet_path(tiff) as work_path:
+        assert work_path.suffix == ".jpg"
+        with Image.open(work_path) as im:
+            rgb = np.asarray(im.convert("RGB"))
+
+    assert rgb.shape == (100, 80, 3)
+    assert rgb[50, 40, 0] == 0x80  # 0x8000 >> 8

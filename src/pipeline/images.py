@@ -58,11 +58,33 @@ def _largest_pyramid_array(path: Path) -> np.ndarray:
     raise PipelineError(f"No image levels in TIFF: {path}")
 
 
+def _to_uint8(arr: np.ndarray) -> np.ndarray:
+    """Downscale TIFF arrays to uint8 for PIL.
+
+    PIL's fromarray only accepts multi-band images as uint8, so 16-bit
+    RGB scanner TIFFs must be rescaled first. Integers keep their top
+    8 bits (16-bit: ``value >> 8``); floats are min/max-normalised.
+    """
+    if arr.dtype == np.uint8:
+        return arr
+    if np.issubdtype(arr.dtype, np.integer):
+        shift = max(arr.dtype.itemsize * 8 - 8, 0)
+        return (arr >> shift).astype(np.uint8)
+    if np.issubdtype(arr.dtype, np.floating):
+        lo = float(arr.min())
+        hi = float(arr.max())
+        if hi <= lo:
+            return np.zeros(arr.shape, dtype=np.uint8)
+        scaled = (arr - lo) / (hi - lo) * 255.0
+        return scaled.round().astype(np.uint8)
+    raise PipelineError(f"Unsupported TIFF dtype: {arr.dtype}")
+
+
 def _array_to_rgb_pil(arr: np.ndarray) -> Image.Image:
     if arr.ndim == 2:
-        return Image.fromarray(arr).convert("RGB")
+        return Image.fromarray(_to_uint8(arr)).convert("RGB")
     if arr.ndim == 3 and arr.shape[2] >= 3:
-        return Image.fromarray(arr[..., :3]).convert("RGB")
+        return Image.fromarray(_to_uint8(arr[..., :3])).convert("RGB")
     raise PipelineError("Unsupported TIFF array shape")
 
 
